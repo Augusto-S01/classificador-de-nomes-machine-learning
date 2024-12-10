@@ -17,9 +17,12 @@ ENV PATH /opt/conda/envs/te2/bin:$PATH
 # Copiar o restante do código para o container
 COPY . /app/
 
+# Rodar collectstatic para coletar os arquivos estáticos
+RUN python manage.py collectstatic --noinput
+
 # Expor a porta padrão do Django
 EXPOSE 8000
 
 # Executar o servidor Django usando o ambiente Conda
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:9992"]
 

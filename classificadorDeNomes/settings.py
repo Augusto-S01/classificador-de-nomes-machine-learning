@@ -25,9 +25,18 @@ SECRET_KEY = 'django-insecure-h#q#3g_%*hf^f$*k#0^mznc)q9w8r=&gly1$5o6mpky0e&97vy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://te.augustosouza.dev',  # Substitua com o seu domínio
+]
 
 ALLOWED_HOSTS = ['te.augustosouza.dev', 'localhost', '127.0.0.1','augustosouza.dev']
-
+# Diretório onde os arquivos estáticos serão coletados (para produção)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Diretório para armazenar arquivos estáticos (em desenvolvimento)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -117,8 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
