@@ -1,25 +1,25 @@
-# Base image
-FROM python:3.10-slim
+# Usar a imagem base do Miniconda
+FROM continuumio/miniconda3:latest
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set working directory in the container
+# Definir o diretório de trabalho
 WORKDIR /app
 
-# Copy requirements file to the container
-COPY requirements.txt /app/
+# Copiar o arquivo environment.yml
+COPY environment.yml /app/
 
-# Install dependencies
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+# Criar o ambiente Conda e ativá-lo
+RUN conda env create -f environment.yml && \
+    echo "conda activate te2" >> ~/.bashrc
 
-# Copy the rest of the application code
+# Tornar o ambiente Conda o padrão
+ENV PATH /opt/conda/envs/te2/bin:$PATH
+
+# Copiar o restante do código para o container
 COPY . /app/
 
-# Expose the default Django port
+# Expor a porta padrão do Django
 EXPOSE 8000
 
-# Start the Django development server
+# Executar o servidor Django usando o ambiente Conda
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
