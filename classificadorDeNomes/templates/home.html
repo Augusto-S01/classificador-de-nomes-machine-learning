@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}Classificador de Nomes Brasileiros{% endblock %}
+
+{% block content %}
+<main class="container mx-auto px-4 py-8">
+    <section id="home" class="mb-16 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-primary mb-4">Classificador de Nomes Brasileiros</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">Descubra os algoritmos de Machine Learning por trás da classificação de nomes brasileiros.</p>
+    </section>
+
+    <section id="classificador" class="mb-16">
+        <div class="bg-white shadow-lg rounded-lg p-6 md:p-8">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Classificador de Nomes</h2>
+            <form method="post" action="" class="mb-8">
+                {% csrf_token %}
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" name="nome" placeholder="Digite um nome" required class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300">Classificar</button>
+                </div>
+            </form>
+            {% if result %}
+            <div id="resultado" class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-6 text-primary">Resultado da Classificação</h3>
+                <div class="space-y-8">
+                    {% if result.data %}
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h4 class="font-semibold mb-4 text-lg">Informações do Nome</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <p><strong>Nome:</strong> {{ result.data.nome }}</p>
+                            <p><strong>Grupo:</strong> {{ result.data.nome_grupo }}</p>
+                            <p><strong>Classificação Geral:</strong> <span class="{% if result.data.classificacao == 'M' %}text-blue-600{% else %}text-pink-600{% endif %} font-semibold">{% if result.data.classificacao == 'M' %}Masculino{% else %}Feminino{% endif %}</span></p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h4 class="font-semibold mb-4 text-lg">Classificação por Modelos</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {% for model, classification in result.models.items %}
+                            <div class="bg-gray-50 p-4 rounded-md">
+                                <p class="font-medium mb-2">{{ model|title }}</p>
+                                <p class="{% if classification == 'M' %}text-blue-600{% else %}text-pink-600{% endif %} font-semibold">
+                                    {% if classification == 'M' %}Masculino{% else %}Feminino{% endif %}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if result.data %}
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <h4 class="font-semibold mb-4 text-lg">Estatísticas</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p><strong>Frequência Total:</strong> {{ result.data.frequencia_total|floatformat:0|intcomma }}</p>
+                                <p><strong>Frequência Masculina:</strong> {{ result.data.frequencia_masculina|floatformat:0|intcomma }}</p>
+                                <p><strong>Frequência Feminina:</strong> {{ result.data.frequencia_feminina|floatformat:0|intcomma }}</p>
+                            </div>
+                            <div>
+                                <p><strong>Porcentagem Masculina:</strong> {{ result.data.porcentagem_masculina|multiply:100|floatformat:2 }}%</p>
+                                <p><strong>Porcentagem Feminina:</strong> {{ result.data.porcentagem_feminina|multiply:100|floatformat:2 }}%</p>
+                                <p><strong>Proporção (M/F):</strong> {{ result.data.proporcao|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section id="como-funciona" class="mb-16">
+        <h2 class="text-3xl font-bold mb-8 text-primary text-center">Como funciona o classificador</h2>
+        <p class="mb-8 text-center text-lg">O classificador utiliza a base de dados disponibilizada no <a href="https://brasil.io" class="text-blue-600 hover:underline">brasil.io</a> para treinar uma série de algoritmos de machine learning.</p>
+
+        <div class="swiper mainSwiper">
+            <div class="swiper-wrapper">
+                {% for algorithm in algorithms %}
+                <div class="swiper-slide">
+                    <div class="swiper customCards {{ algorithm.class }}Swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide cardContainer bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-6">
+                                <h3 class="text-2xl font-bold mb-4">{{ algorithm.name }}</h3>
+                                <img src="{% static algorithm.image %}" alt="{{ algorithm.name }}" class="w-32 h-32 mx-auto mb-4"/>
+                            </div>
+                            <div class="swiper-slide cardContainer bg-white text-gray-800 rounded-lg p-6">
+                                <p class="text-lg">{{ algorithm.description }}</p>
+                            </div>
+                            <div class="swiper-slide cardContainer bg-gray-100 text-gray-800 rounded-lg p-6">
+                                <h4 class="text-xl font-semibold mb-4">Métricas obtidas</h4>
+                                <table class="w-full">
+                                    <tr><td class="font-medium">Acurácia</td><td>{{ algorithm.metrics.accuracy }}</td></tr>
+                                    <tr><td class="font-medium">Precisão</td><td>{{ algorithm.metrics.precision }}</td></tr>
+                                    <tr><td class="font-medium">Recall</td><td>{{ algorithm.metrics.recall }}</td></tr>
+                                    <tr><td class="font-medium">F1</td><td>{{ algorithm.metrics.f1 }}</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="ml-representation" class="mb-16">
+        <h2 class="text-3xl font-bold mb-8 text-primary">Representação de Nomes para Machine Learning</h2>
+        <p class="mb-6 text-lg">Como a máquina "vê" o nome de uma pessoa é bem diferente da nossa perceção. Na realidade, ela trabalha com uma representação binária do nome. Vamos analisar como isso funciona usando o nome "Ariel" como exemplo.</p>
+
+        <div class="bg-white shadow rounded-lg p-6 mb-8">
+            <h3 class="text-2xl font-semibold mb-4">Exemplo: Classificando o nome "Ariel"</h3>
+            <p class="mb-4">O nome "Ariel" possui 5 letras. Inicialmente, podemos representá-lo numa tabela da seguinte forma:</p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full mb-6">
+                    <tr class="bg-gray-100">
+                        <th class="p-2 text-left">Nome</th>
+                        <th class="p-2 text-left">LETRA_1</th>
+                        <th class="p-2 text-left">LETRA_2</th>
+                        <th class="p-2 text-left">LETRA_3</th>
+                        <th class="p-2 text-left">LETRA_4</th>
+                        <th class="p-2 text-left">LETRA_5</th>
+                    </tr>
+                    <tr>
+                        <td class="p-2">Ariel</td>
+                        <td class="p-2">A</td>
+                        <td class="p-2">R</td>
+                        <td class="p-2">I</td>
+                        <td class="p-2">E</td>
+                        <td class="p-2">L</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p class="mb-4">Para tornar a informação mais acessível para o modelo, podemos criar colunas adicionais que representam a presença ou ausência de cada letra em cada posição:</p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <tr class="bg-gray-100">
+                        <th class="p-2 text-left">Nome</th>
+                        <th class="p-2 text-left">LETRA_1_A</th>
+                        <th class="p-2 text-left">LETRA_2_R</th>
+                        <th class="p-2 text-left">LETRA_3_I</th>
+                        <th class="p-2 text-left">LETRA_4_E</th>
+                        <th class="p-2 text-left">LETRA_5_L</th>
+                    </tr>
+                    <tr>
+                        <td class="p-2">Ariel</td>
+                        <td class="p-2">1</td>
+                        <td class="p-2">1</td>
+                        <td class="p-2">1</td>
+                        <td class="p-2">1</td>
+                        <td class="p-2">1</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <h3 class="text-2xl font-semibold mb-4">Por que usar esta representação?</h3>
+        <ul class="list-disc pl-6 mb-6 space-y-2">
+            <li>Elimina qualquer noção de ordem alfabética que poderia ser inferida erroneamente pelos modelos.</li>
+            <li>Permite que o modelo identifique padrões específicos de letras em certas posições, que podem ser característicos de nomes masculinos ou femininos.</li>
+            <li>Facilita o processamento por algoritmos que trabalham melhor com dados numéricos.</li>
+        </ul>
+        <p>Com esta representação, o modelo de machine learning pode analisar e aprender padrões mais eficientemente, permitindo uma classificação mais precisa dos nomes em categorias de gênero.</p>
+    </section>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var swiperMain = new Swiper(".mainSwiper", {
+            spaceBetween: 50,
+            slidesPerView: 1.5,
+            centeredSlides: true,
+            grabCursor: true,
+            breakpoints: {
+                640: {
+                    slidesPerView: 1.5,
+                },
+                768: {
+                    slidesPerView: 1.8,
+                },
+                1024: {
+                    slidesPerView: 2.2,
+                },
+            },
+        });
+
+        function configureSwiper(swiperInstance) {
+            swiperInstance.slides.forEach((slide, index) => {
+                slide.addEventListener('click', () => {
+                    if (swiperInstance.activeIndex === swiperInstance.slides.length - 1) {
+                        swiperInstance.slideTo(0, 0);
+                    } else {
+                        swiperInstance.slideNext();
+                    }
+                });
+            });
+        }
+
+        var algorithmSwipers = [
+            ".logRegSwiper", ".randForestSwiper", ".naiveBayesSwiper",
+            ".redeNeuralSwiper", ".boostingSwiper", ".stackingSwiper", ".baggingSwiper"
+        ];
+
+        algorithmSwipers.forEach(function(swiperClass) {
+            var swiper = new Swiper(swiperClass, {
+                effect: "cards",
+                grabCursor: true,
+                allowTouchMove: true,
+            });
+            configureSwiper(swiper);
+        });
+    });
+</script>
+{% endblock %}

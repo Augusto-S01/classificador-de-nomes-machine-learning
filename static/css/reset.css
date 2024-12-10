@@ -1,0 +1,28 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Reset list styles */
+ul, ol {
+    list-style: none;
+}
+
+/* Reset anchor styles */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Reset form element styles */
+input, button, textarea, select {
+    font: inherit;
+}
+
+/* Ensure responsive images */
+img {
+    max-width: 100%;
+    height: auto;
+}

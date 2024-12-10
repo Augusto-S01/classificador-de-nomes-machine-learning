@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt_br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Classificador de Nomes Brasileiros{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <header class="bg-primary text-white w-full">
+        <nav class="container mx-auto px-4 py-4">
+            <ul class="flex justify-center space-x-6">
+                <li><a href="#home" class="hover:text-secondary transition duration-300">Início</a></li>
+                <li><a href="#como-funciona" class="hover:text-secondary transition duration-300">Como Funciona</a></li>
+                <li><a href="#about" class="hover:text-secondary transition duration-300">Sobre</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <p>&copy; 2024 Classificador de Nomes Brasileiros.</p>
+        <p>Desenvolvido por <a href="https://www.linkedin.com/in/augusto-s01/">Augusto Souza</a>. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

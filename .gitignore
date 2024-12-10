@@ -1,0 +1,6 @@
+modelos_e_resultados/
+__pycache__/
+*.pyc
+*.h5
+*.joblib
+db.sqlite3
